@@ -3,4 +3,4 @@ gunicorn
 requests
 ccxt
 pandas
-git+https://github.com/twopirllc/pandas-ta.git
+pandas-ta
