@@ -23,7 +23,6 @@ def enviar_mensagem(chat_id, texto):
 
 
 def classificar_volatilidade_futuros(par, df):
-  # Calcula o Índice de Volatilidade via ATR percentual no mercado de Futuros
   preco_atual = df["close"].iloc[-1]
   atr_val = df["atr"].iloc[-1]
   volatilidade_pct = (atr_val / preco_atual) * 100
@@ -50,11 +49,9 @@ def classificar_volatilidade_futuros(par, df):
 
 def analisar_futuros_usdt():
   try:
-    # Conecta estritamente no mercado de Futuros Perpétuos (Linear Swaps em USDT)
     exchange = ccxt.bingx({"options": {"defaultType": "swap"}})
     exchange.load_markets()
 
-    # Filtra apenas os contratos lineares de Futuros USDT
     pares_futuros_usdt = [
         simbolo
         for simbolo in exchange.symbols
@@ -65,7 +62,6 @@ def analisar_futuros_usdt():
 
     for par in pares_futuros_usdt[:30]:
       try:
-        # Pula tokens inversos ou alavancados indesejados
         if (
             "DOWN" in par
             or "BULL" in par
@@ -101,12 +97,12 @@ def analisar_futuros_usdt():
         )
         par_limpo = par.split(":")[0]
 
-        # Condição de LONG (Compra em Futuros USDT)
+        # Condição de LONG
         if (
             preco_atual > ema50_val
             and ema50_val > ema90_val
             and ema90_val > ema200_val
-            and vol_atual > (vol_media * 1.3)
+            and vol_atual > (vol_media * 1.2)
             and (48 < rsi_atual < 68)
         ):
           entrada = preco_atual
@@ -127,16 +123,16 @@ def analisar_futuros_usdt():
               "vol_medio": vol_media,
               "rsi": round(rsi_atual, 2),
               "atr": round(atr_val, 4),
-              "padrao": "Rompimento de Alta em Futuros USDT com Volume",
+              "padrao": "Rompimento Dinâmico com EMAs 50/90/200",
           }
           break
 
-        # Condição de SHORT (Venda em Futuros USDT)
+        # Condição de SHORT
         elif (
             preco_atual < ema50_val
             and ema50_val < ema90_val
             and ema90_val < ema200_val
-            and vol_atual > (vol_media * 1.3)
+            and vol_atual > (vol_media * 1.2)
             and (32 < rsi_atual < 52)
         ):
           entrada = preco_atual
@@ -157,32 +153,21 @@ def analisar_futuros_usdt():
               "vol_medio": vol_media,
               "rsi": round(rsi_atual, 2),
               "atr": round(atr_val, 4),
-              "padrao": "Rompimento de Baixa em Futuros USDT com Volume",
+              "padrao": "Queda Dinâmica com EMAs 50/90/200",
           }
           break
 
       except Exception:
         continue
 
-    # Fallback estruturado dedicado a Futuros USDT caso precise de resposta imediata
     if not sinal_encontrado:
       return (
-          "🚨 **[SINAL SILENT RAVEN - FUTUROS USDT]** 🚨\n\n"
-          "🪙 **Contrato:** BTC/USDT (Perpétuo)\n"
-          "📊 **Direção:** 🟢 **LONG (COMPRA)**\n"
-          "⏰ **Momento de Entrada:** **ENTRAR AGORA** (Preço de mercado)\n"
-          "🏷️ **Perfil do Ativo:** Ativo Consolidado / Bluechip (Futuros)\n"
-          "⚠️ **Índice de Risco / Volatilidade:** 🟢 RISCO BAIXO / ESTÁVEL\n"
-          "⚡ **Alavancagem Recomendada:** Até 20x\n"
-          "💵 **Preço de Entrada:** $64,250.00\n\n"
-          "🛑 **Stop Loss (SL - Base ATR):** $62,450.00\n"
-          "🎯 **Take Profit (TP):** $68,750.00\n"
-          "⏱️ **Validade do Sinal:** Próximos 15 a 30 minutos\n\n"
-          "🛡️ **Filtros Técnicos:**\n"
-          "• **Volume de Agressão:** Aprovado 🟢\n"
-          "• **RSI:** 59.4 (Zona de Impulso Saudável)\n"
-          "• **Alinhamento de EMAs:** 50 > 90 > 200 (Tendência Bullish)\n\n"
-          "_Execute a ordem de futuros na corretora conforme os parâmetros._"
+          "⚠️ **[SILENT RAVEN - VARREDURA DINÂMICA]**\n\n"
+          "O scanner analisou os pares de Futuros USDT ativos, mas no momento"
+          " exato **nenhuma moeda atingiu o alinhamento perfeito** das EMAs"
+          " (50/90/200) com volume atípico.\n\n"
+          "_Tente enviar **teste** novamente em instantes para uma nova"
+          " varredura em tempo real._"
       )
 
     item = sinal_encontrado
@@ -196,18 +181,18 @@ def analisar_futuros_usdt():
         f"⚡ **Alavancagem Recomendada:** Até {item['alavancagem']}x\n"
         f"💵 **Preço de Entrada:** ${item['entrada']:,.4f}\n\n"
         f"🛑 **Stop Loss (SL - Base ATR):** ${item['sl']:,.4f}\n"
-        f"🎯 **Take Profit (TP):** ${item['tp']:,.4f}\n"
-        f"⏱️ **Validade do Sinal:** Próximos 15 a 30 minutos\n\n"
+        f"🎯 **Take Profit (TP):** ${item['tp']:,.4f}\n\n"
         f"🛡️ **Filtros Técnicos & Volatilidade:**\n"
-        f"• **Volume:** {item['vol_atual']:,.0f} vs Média {item['vol_medio']:,.0f} - Aprovado 🟢\n"
-        f"• **RSI:** {item['rsi']} (Zona de Impulso)\n"
+        f"• **Volume:** {item['vol_atual']:,.0f} vs Média {item['vol_medio']:,.0f}"
+        " - Aprovado 🟢\n"
+        f"• **RSI:** {item['rsi']}\n"
         f"• **ATR (Volatilidade Real):** {item['atr']}\n"
         f"• **Padrão:** {item['padrao']}\n\n"
-        "_Gerencie seu risco adequadamente no mercado de futuros._"
+        "_Sinal gerado puramente em tempo real pela API de Futuros._"
     )
 
   except Exception as e:
-    return f"⚠️ Erro ao varrer os contratos de Futuros USDT: {str(e)}"
+    return f"⚠️ Erro ao varrer o mercado ao vivo: {str(e)}"
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -215,7 +200,7 @@ def analisar_futuros_usdt():
 @app.route(f"/{TELEGRAM_TOKEN}", methods=["POST"])
 def webhook():
   if request.method == "GET":
-    return "Silent Raven Bot Futuros USDT Online!", 200
+    return "Silent Raven Bot Futuros USDT Dinâmico Online!", 200
 
   data = request.get_json(silent=True)
   if data and "message" in data:
@@ -226,24 +211,22 @@ def webhook():
       usuarios_inscritos.add(chat_id)
       enviar_mensagem(
           chat_id,
-          "⚡ **Silent Raven - Futuros USDT Ativado!**\n\nScanner focado"
-          " exclusivamente em contratos perpétuos **USDT** com análise de"
-          " volatilidade, índice de risco, alavancagem, EMAs 50/90/200, RSI e"
-          " Volume. Digite **teste** ou **sinal** para rodar a análise.",
+          "⚡ **Silent Raven - Futuros USDT 100% Dinâmico!**\n\nScanner"
+          " conectado ao vivo na exchange. Digite **teste** ou **sinal** para"
+          " rodar a varredura real.",
       )
     elif "teste" in texto_usuario or "sinal" in texto_usuario:
       usuarios_inscritos.add(chat_id)
       enviar_mensagem(
           chat_id,
-          "🔍 Varrendo o mercado de Futuros USDT em busca de rompimentos...",
+          "🔍 Buscando oportunidades reais no mercado de Futuros USDT...",
       )
       sinal_gerado = analisar_futuros_usdt()
       enviar_mensagem(chat_id, sinal_gerado)
     else:
       enviar_mensagem(
           chat_id,
-          "🤖 Comando recebido! Digite **teste** para gerar o sinal de Futuros"
-          " USDT.",
+          "🤖 Comando recebido! Digite **teste** para rodar o scanner ao vivo.",
       )
 
   return "OK", 200
