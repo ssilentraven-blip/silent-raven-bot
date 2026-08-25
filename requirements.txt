@@ -3,4 +3,3 @@ gunicorn
 requests
 ccxt
 pandas
-pandas-ta
