@@ -31,8 +31,8 @@ def analisar_mercado_com_filtros():
     return (
         f"🚨 **[SINAL VALIDADO - SILENT RAVEN]** 🚨\n\n"
         f"🪙 **Ativo:** {ativo}\n"
-        f"📊 **Filtro de Volume:** Aprovado 🟢 ({volume_atual:,.0f} vs"
-        f" Média {volume_medio:,.0f})\n"
+        f"📊 **Filtro de Volume:** Aprovado 🟢 ({volume_atual:,.0f} vs Média"
+        f" {volume_medio:,.0f})\n"
         f"📈 **Padrão Gráfico:** {rompimento}\n"
         "⚡ **Direção:** LONG / Compra\n"
         "🎯 **Take Profit:** Alvo Técnico Definido\n"
@@ -59,14 +59,13 @@ def webhook():
       enviar_mensagem(
           chat_id,
           "⚡ **Bem-vindo ao Silent Raven Bot!**\n\nFiltros de **Volume** e"
-          " **Rompimento de Topo/Fundo** ativados. Digite **teste** para"
-          " rodar o scanner de mercado.",
+          " **Rompimento de Topo/Fundo** ativados. Digite **teste** para rodar"
+          " o scanner de mercado.",
       )
     elif "teste" in texto_usuario:
       usuarios_inscritos.add(chat_id)
       enviar_mensagem(
-          chat_id,
-          "🔍 Analisando livro de ordens, volume atípico e rompimentos...",
+          chat_id, "🔍 Analisando livro de ordens, volume atípico e rompimentos..."
       )
       sinal_gerado = analisar_mercado_com_filtros()
       if sinal_gerado:
@@ -80,8 +79,8 @@ def webhook():
     else:
       enviar_mensagem(
           chat_id,
-          "🤖 Comando não reconhecido. Digite **teste** para ver os sinais"
-          " em ação.",
+          "🤖 Comando não reconhecido. Digite **teste** para ver os sinais em"
+          " ação.",
       )
 
   return "OK", 200
