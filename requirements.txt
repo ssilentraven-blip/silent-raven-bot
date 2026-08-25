@@ -1,3 +1,6 @@
 flask
 gunicorn
 requests
+ccxt
+pandas
+pandas_ta
