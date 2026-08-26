@@ -1,4 +1,4 @@
 ccxt
 pandas
-pandas-ta
 requests
+git+https://github.com/twopirllc/pandas-ta.git
